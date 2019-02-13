@@ -31,6 +31,7 @@ void deleteParameter(Parameter ** parameter)
     (*parameter)->value = NULL;
     (*parameter)->data_type = 0;
     (*parameter)->type = 0;
+    free(*parameter);
 }
 
 #endif // PARAMETERS_H_INCLUDED
