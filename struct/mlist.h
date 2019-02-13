@@ -30,7 +30,7 @@ MList * newMList ()
     return list;
 }
 
-MListNode * newMListNode(void * info)
+MListNode * newMListNode (void * info)
 {
     MListNode * node = (MListNode *)malloc(sizeof(MListNode));
     node->info = info;
@@ -38,6 +38,13 @@ MListNode * newMListNode(void * info)
     node->preview = NULL;
 
     return node;
+}
+
+void deleteMListNode (MListNode ** node)
+{
+    (*node)->next = NULL;
+    (*node)->preview = NULL;
+    free(*node);
 }
 
  void push_front (MList ** list, void * info)
@@ -118,7 +125,7 @@ void * pop_front (MList ** list)
         (*list)->size--;
 
         void * result = temp->info;
-        free(temp);
+        deleteMListNode(&temp);
         temp = NULL;
 
         return result;
@@ -137,7 +144,7 @@ void * pop_back (MList ** list)
         (*list)->size--;
 
         void * result = temp->info;
-        free(temp);
+        deleteMListNode(&temp);
         temp = NULL;
 
         return result;
@@ -197,16 +204,16 @@ void * get_item_unordered (MList * list, void * info, int (*compare)(void *, voi
     return NULL;
 }
 
-void clearMList(MList ** list)
+void clearMList(MList ** list, void (*mFree)(void **))
 {
-    printf("Limpiando lista >>\n");
+    printf("Vaciando lista >>\n");
     while ((*list)->size > 0)
     {
         void * temp = pop_front(list);
-        free(temp);
+        mFree(&temp);
         temp = NULL;
     }
-    printf("<< Lista limpia\n");
+    printf("<< Lista vacía\n");
 }
 
  #endif // MLIST_H_INCLUDED
