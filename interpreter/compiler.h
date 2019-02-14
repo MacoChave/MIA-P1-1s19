@@ -6,6 +6,8 @@
 #include "../struct/mlist.h"
 #include "../struct/parameter.h"
 
+#define _SIZE_STRING_ sizeof(char) * 125
+
 /* TIPO DE DATO */
 #define _INT_ 0
 #define _CHAR_ 1
@@ -94,7 +96,7 @@ MList * automaton (char * line, int * cmd_type)
 
     MList * parameters = newMList();
 
-    size_t _SIZE_STRING_ = sizeof(char) * 125;
+    // size_t _SIZE_STRING_ = sizeof(char) * 125;
     char * temp = (char *)malloc(_SIZE_STRING_);
     memset(temp, 0, _SIZE_STRING_);
 
@@ -106,7 +108,10 @@ MList * automaton (char * line, int * cmd_type)
     while (*s)
     {
         if (*s == '#')
+        {
+            memset(temp, 0, _SIZE_STRING_);
             break;
+        }
         if (*s == '\n' || *s == '\r')
         {
             s++;
@@ -164,7 +169,7 @@ MList * automaton (char * line, int * cmd_type)
             if (*s != ' ')
             {
                 sprintf(temp, "%s%c", temp, tolower(*s));
-                type_value = (isdigit(*s) && type_value == _INT_) ? _INT_ : _CHAR_;
+                type_value = ((isdigit(*s) || *s == '-') && type_value == _INT_) ? _INT_ : _CHAR_;
                 s++;
                 continue;
             }
@@ -178,7 +183,7 @@ MList * automaton (char * line, int * cmd_type)
                 }
                 else
                 {
-                    if (param >= 0)
+                    if (param >= 0 && strlen(temp) > 0)
                     {
                         value = getValue(temp, &type_value);
                         memset(temp, 0, _SIZE_STRING_);
@@ -199,7 +204,7 @@ MList * automaton (char * line, int * cmd_type)
 
     if (strlen(temp) > 0)
     {
-        if (param > 0)
+        if (param >= 0)
         {
             value = getValue(temp, &type_value);
             memset(temp, 0, _SIZE_STRING_);
@@ -221,16 +226,37 @@ MList * automaton (char * line, int * cmd_type)
 void execute (int cmd_type, MList ** parameters)
 {
     Parameter * param = (Parameter *)pop_front(parameters);
+    printf("\n----------> BEGIN\n");
     while(param != NULL){
         printf("%d: %s as %d\n", param->type, param->value, param->data_type);
         deleteParameter(&param);
         param = (Parameter *)pop_front(parameters);
     }
+    printf("----------> END\n");
 }
 
+/* ANALIZAR ARCHIVO */
 void analizeFile (char * filename)
 {
-    printf("Archivo a leer: %s\n", filename);
+    FILE * file;
+
+    if ((file = fopen(filename, "r")) == NULL)
+        return;
+    
+    while(!feof(file)){
+        MList * parameters = NULL;
+        int cmd_type = 0;
+        char string[200];
+        memset(string, 0, 200);
+        fgets(string, 200, file);
+        parameters = automaton(string, &cmd_type);
+        if (parameters->size > 0 && cmd_type > 0)
+            execute(cmd_type, &parameters);
+            
+        free(parameters);
+        parameters = NULL;
+    }
+    fclose(file);
 }
 
 /* ANALIZAR LINEA DE CODIGO */

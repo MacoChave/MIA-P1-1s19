@@ -40,10 +40,10 @@ fdisk -add~:~-500 -size~:~10 -unit~:~K -path~:~"/home/misdiscos/Disco4.dsk" -nam
 fdisk -add~:~ -unit~:~M -path~:~"/home/mis discos/Disco4.dsk" -name~:~"Particion 4"
 
 #Monta las particiones de Disco1.dsk
-mount -path~:~/home/Disco1.dsk -name~:~Part1 #id=vda1
-mount -path~:~/home/Disco2.dsk -name~:~Part1 #id=vdb1
-mount -path~:~/home/Disco3.dsk -name~:~Part2 #id=vdc1
-mount -path~:~/home/Disco1.dsk -name~:~Part2 #id=vda2
+mount -path~:~/home/Disco1.dsk -name~:~Part1  #id=vda1
+mount -path~:~/home/Disco2.dsk -name~:~Part1  #id=vdb1
+mount -path~:~/home/Disco3.dsk -name~:~Part2  #id=vdc1
+mount -path~:~/home/Disco1.dsk -name~:~Part2  #id=vda2
 
 #Desmonta la partición con id vda1 (En Disco1.dsk)
 unmount -id~:~vda1
