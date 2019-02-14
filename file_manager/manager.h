@@ -91,4 +91,39 @@ int getExtension (char * filename)
     return extension_number;
 }
 
+int createDirectory (char * filename)
+{
+    char * dir = getDirectoryPath(filename);
+    size_t size = strlen(filename) + sizeof(char) * 20;
+    char * cmd = (char *)malloc(size);
+    memset(cmd, 0, size);
+    strcpy(cmd, "sudo mkdir -m 777 -p \"");
+    strcat(cmd, dir);
+    strcat(cmd, "\"");
+
+    int res = (system(cmd) == 0) ? 1 : 0;
+
+    return res;
+}
+
+int createDisk (char * filename, int size)
+{
+    FILE * file;
+
+    if ((file = fopen(filename, "wb")) == NULL)
+        return 0;
+    
+    char buffer[_KILOBYTE_];
+    memset(buffer, '\0', _KILOBYTE_);
+
+    for(int i = 0; i < size / _KILOBYTE_; i++)
+    {
+        fwrite(buffer, sizeof(buffer), 1, file);
+        fflush(file);
+    }
+
+    fclose(file);
+    return 1;
+}
+
 #endif // MANAGER_H_INCLUDED
