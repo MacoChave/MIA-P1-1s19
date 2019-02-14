@@ -126,4 +126,9 @@ int createDisk (char * filename, int size)
     return 1;
 }
 
+int deleteDisk (char * filename)
+{
+    return (remove(filename) == 0) ? 1 : 0;
+}
+
 #endif // MANAGER_H_INCLUDED
