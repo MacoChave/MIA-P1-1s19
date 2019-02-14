@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "interpreter/compiler.h"
 
 /*****************************************
  * METODO LECTURA DE LÍNEA DE COMANDO
@@ -63,7 +64,7 @@ int main (int argc, char const *argv[])
         {
             if (strncmp(string, "exit", sizeof(char) * 4) == 0)
                 break;
-            printf("-> %s\n", string);
+            analizeLine(string);
         }
         else
             break;
