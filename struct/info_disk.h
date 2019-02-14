@@ -5,9 +5,6 @@
 #include <string.h>
 #include <time.h>
 
-#define _KILOBYTE_ 1024
-#define _MEGABYTE_ _KILOBYTE_ * 1024
-
 typedef struct Partition Partition;
 typedef struct MBR MBR;
 typedef struct EBR EBR;

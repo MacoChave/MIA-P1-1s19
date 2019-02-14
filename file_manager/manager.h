@@ -3,10 +3,7 @@
 
 #include <stdio.h>
 #include "../struct/info_disk.h"
-
-#define _DISK_ 0
-#define _PNG_ 1
-#define _JPG_ 2
+#include "../globalvar/global.h"
 
 char * getDirectoryPath (char * filename)
 {
@@ -101,9 +98,9 @@ int createDirectory (char * filename)
     strcat(cmd, dir);
     strcat(cmd, "\"");
 
-    int res = (system(cmd) == 0) ? 1 : 0;
+    int result = (system(cmd) == 0) ? 1 : 0;
 
-    return res;
+    return result;
 }
 
 int createDisk (char * filename, int size)
@@ -129,6 +126,43 @@ int createDisk (char * filename, int size)
 int deleteDisk (char * filename)
 {
     return (remove(filename) == 0) ? 1 : 0;
+}
+
+int existDisk (char * filename)
+{
+    FILE * file;
+    int result = 0;
+
+    if ((file = fopen(filename, "r")) != NULL)
+    {
+        result = 1;
+        fclose(file);
+    }
+
+    return result;
+}
+
+MBR getMBR (char * filename)
+{
+    MBR mbr = newMBR(0);
+    FILE * file;
+    if ((file = fopen(filename, "rb")) == NULL)
+        return mbr;
+    
+    fread(&mbr, sizeof(MBR), 1, file);
+    fclose(file);
+    return mbr;
+}
+
+int updateMBR (char * filename, MBR * data)
+{
+    FILE * file;
+    if ((file = fopen(filename, "rb+")) == NULL)
+        return 0;
+    
+    fwrite(data, sizeof(MBR), 1, file);
+    fclose(file);
+    return 1;
 }
 
 #endif // MANAGER_H_INCLUDED

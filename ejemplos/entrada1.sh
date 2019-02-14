@@ -1,13 +1,15 @@
 # EJECUTA EL SCRIPT
-# exec -path~:~ejemplos/entrada1.sh
+# exec -path~:~/home/marco/entrada1.sh
 
-#Crea un disco de 3000 Kb en la carpeta home
+#Crea un disco de 3000 Kb en /home/user
 Mkdisk -Size~:~3000 -unit~:~K -path~:~/home/user/Disco1.dsk
 #No es necesario utilizar comillas para la ruta en este caso
+#Crea un disco de 3000 kb en /home/user
 Mkdisk -path~:~/home/user/Disco2.dsk -Unit~:~K -size~:~3000
 #Se ponen comillas por la carpeta “mis discos”, se crea si no está
+#Crea un disco de 5 mb en /home/mis discos
 mkdisk -size~:~5 -unit~:~M -path~:~"/home/mis discos/Disco3.dsk"
-#Creará un disco de 10 Mb ya que no hay parámetro -unit~:~ 
+#Creará un disco de 10 Mb en /home/mis discos
 mkdisk -size~:~10 -path~:~"/home/mis discos/Disco4.dsk"
 
 #Elimina Disco4.dsk

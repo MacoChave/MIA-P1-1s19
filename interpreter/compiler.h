@@ -5,33 +5,8 @@
 #include <stdlib.h>
 #include "../struct/mlist.h"
 #include "../struct/parameter.h"
-
-#define _SIZE_STRING_ sizeof(char) * 125
-
-/* TIPO DE DATO */
-#define _INT_ 0
-#define _CHAR_ 1
-#define _STRING_ 2
-
-/* TIPO DE COMANDO */
-#define _EXEC_ 0
-#define _MKDISK_ 1
-#define _RMDISK_ 2
-#define _FDISK_ 3
-#define _MOUNT_ 4
-#define _UNMOUNT_ 5
-#define _REP_ 6
-
-/* TIPO DE PARAMETRO */
-#define _SIZE_ 0
-#define _PATH_ 1
-#define _UNIT_ 2
-#define _NAME_ 3
-#define _TYPE_ 4
-#define _FIT_ 5
-#define _DELETE_ 6
-#define _ADD_ 7
-#define _ID_ 8
+#include "../globalvar/global.h"
+#include "../command/cmdmkdisk.h"
 
 /* INTERPRETAR TIPO DE COMANDO */
 int getCommandNumber (char * name)
@@ -229,6 +204,7 @@ void execute (int cmd_type, MList ** parameters)
     {
         case _MKDISK_:
             /* CREAR DISCO */
+            exec_mkdisk(parameters);
             break;
         case _RMDISK_:
             /* ELIMINAR DISCO */
