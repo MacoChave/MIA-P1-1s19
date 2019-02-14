@@ -225,14 +225,29 @@ MList * automaton (char * line, int * cmd_type)
 /* EJECUTAR COMANDO */
 void execute (int cmd_type, MList ** parameters)
 {
-    Parameter * param = (Parameter *)pop_front(parameters);
-    printf("\n----------> BEGIN\n");
-    while(param != NULL){
-        printf("%d: %s as %d\n", param->type, param->value, param->data_type);
-        deleteParameter(&param);
-        param = (Parameter *)pop_front(parameters);
+    switch (cmd_type)
+    {
+        case _MKDISK_:
+            /* CREAR DISCO */
+            break;
+        case _RMDISK_:
+            /* ELIMINAR DISCO */
+            break;
+        case _FDISK_:
+            /* CREAR PARTICIONES */
+            break;
+        case _MOUNT_:
+            /* MONTAR PARTICIONES */
+            break;
+        case _UNMOUNT_:
+            /* DESMONTAR PARTICIONES */
+            break;
+        case _REP_:
+            /* CREAR REPORTES */
+            break;
+        default:
+            break;
     }
-    printf("----------> END\n");
 }
 
 /* ANALIZAR ARCHIVO */
