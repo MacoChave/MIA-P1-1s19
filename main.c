@@ -67,7 +67,7 @@ int main (int argc, char const *argv[])
             analizeLine(string);
         }
         else
-            break;
+            continue;
         
         printf("\n******************************\n");
     } while (!exit);
