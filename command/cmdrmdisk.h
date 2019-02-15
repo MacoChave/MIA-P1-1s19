@@ -5,7 +5,6 @@
 #include "../struct/mlist.h"
 #include "../struct/parameter.h"
 
-
 void exec_rmdisk (MList ** parameters)
 {
     char select = 'n';

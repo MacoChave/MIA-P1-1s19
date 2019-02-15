@@ -2,9 +2,8 @@
 #define CMDMKDISK_H_INCLUDED
 
 #include "../file_manager/manager.h"
-#include "../struct/parameter.h"
 #include "../struct/mlist.h"
-#include "../struct/info_disk.h"
+#include "../struct/parameter.h"
 
 void exec_mkdisk (MList ** parameters)
 {
