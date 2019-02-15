@@ -25,35 +25,50 @@ void exec_mkdisk (MList ** parameters)
                 strcpy(path, param->value);
             }
             else
+            {
+                printf("Error: Tipo de dato en parámetro\n");
                 return;
+            }
         }
         else if (param->type == _SIZE_)
         {
             if (param->data_type == _INT_)
                 size = atoi(param->value);
             else
+            {
+                printf("Error: Tipo de dato en size\n");
                 return;
+            }
         }
         else if (param->type == _FIT_)
         {
             if (param->data_type == _STRING_)
                 fit = param->value[0];
             else
+            {
+                printf("Error: Tipo de dato en fit\n");
                 continue;
+            }
         }
         else if (param->type == _UNIT_)
         {
             if (param->data_type == _CHAR_)
                 unit = param->value[0];
             else
+            {
+                printf("Error: Tipo de dato en unit\n");
                 continue;
+            }
         }
         deleteParameter(&param);
         param = NULL;
     }
 
     if (path == NULL || size < 0)
+    {
+        printf("Error: path o tamaño erroneo\n");
         return;
+    }
     
     if (unit == 'k')
         size *= _KILOBYTE_;

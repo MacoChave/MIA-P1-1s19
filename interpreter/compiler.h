@@ -168,6 +168,7 @@ MList * automaton (char * line, int * cmd_type)
 
                         free(value);
                         value = NULL;
+                        type_value = 0;
                     }
                     s += 2;
                     step = 1;
@@ -178,18 +179,15 @@ MList * automaton (char * line, int * cmd_type)
         }
     }
 
-    if (strlen(temp) > 0)
+    if (param >= 0 && strlen(temp) > 0)
     {
-        if (param >= 0)
-        {
-            value = getValue(temp, &type_value);
-            memset(temp, 0, _SIZE_STRING_);
-            Parameter * parameter = newParameter(param, value, type_value);
-            push_back(&parameters, parameter);
+        value = getValue(temp, &type_value);
+        memset(temp, 0, _SIZE_STRING_);
+        Parameter * parameter = newParameter(param, value, type_value);
+        push_back(&parameters, parameter);
 
-            free(value);
-            value = NULL;
-        }
+        free(value);
+        value = NULL;
     }
 
     free(temp);
