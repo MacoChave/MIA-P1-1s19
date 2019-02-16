@@ -8,6 +8,7 @@
 #include "../globalvar/global.h"
 #include "../command/cmdmkdisk.h"
 #include "../command/cmdrmdisk.h"
+#include "../command/cmdfdisk.h"
 
 /* INTERPRETAR TIPO DE COMANDO */
 int getCommandNumber (char * name)
@@ -210,7 +211,7 @@ void execute (int cmd_type, MList ** parameters)
             exec_rmdisk(parameters);
             break;
         case _FDISK_:
-            /* CREAR PARTICIONES */
+            exec_fdisk(parameters);
             break;
         case _MOUNT_:
             /* MONTAR PARTICIONES */
