@@ -23,30 +23,53 @@ void exec_mkdisk (MList ** parameters)
                 path = (char *)malloc(strlen(param->value));
                 strcpy(path, param->value);
             }
-            else return;
+            else
+            {
+                printf("* ERROR: Path debe ser string\n");
+                return;
+            }
         }
         else if (param->type == _SIZE_)
         {
             if (param->data_type == _INT_)
                 size = atoi(param->value);
-            else return;
+            else
+            {
+                printf("* ERROR: Size debe ser int\n");
+                return;
+            }
         }
         else if (param->type == _FIT_)
         {
             if (param->data_type == _STRING_)
                 fit = param->value[0];
+            else
+            {
+                printf("* ERROR: Fit debe ser String\n");
+                return;
+            }
+            
         }
         else if (param->type == _UNIT_)
         {
             if (param->data_type == _CHAR_)
                 unit = param->value[0];
+            else
+            {
+                printf("* ERROR: Unit debe ser char\n");
+                return;
+            }
         }
 
         deleteParameter(&param);
         param = NULL;
     }
 
-    if (path == NULL || size < 0) return;
+    if (path == NULL || size < 0)
+    {
+        printf("* ERROR: Path o Size son requeridos\n");
+        return;
+    }
     
     if (unit == 'k')
         size *= _KILOBYTE_;
@@ -56,13 +79,22 @@ void exec_mkdisk (MList ** parameters)
         size *= _KILOBYTE_;
 
     if (!createDirectory(path))
+    {
+        printf("* ERROR: No se pudo crear el directorio\n");
         return;
+    }
     
     if (existDisk(path))
+    {
+        printf("* ERROR: El disco ya existe\n");
         return;
+    }
     
     if (!createDisk(path, size))
+    {
+        printf("* ERROR: No se pudo crear el disco\n");
         return;
+    }
     
     mbr = newMBR(size);
     updateMBR(path, &mbr);

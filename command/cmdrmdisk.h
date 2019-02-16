@@ -21,17 +21,26 @@ void exec_rmdisk (MList ** parameters)
                 strcpy(path, param->value);
             }
             else
+            {
+                printf("* ERROR: Path debe ser String\n");
                 return;
+            }
             deleteParameter(&param);
             param = NULL;
         }
     }
 
     if (path == NULL)
+    {
+        printf("* ERROR: Path es requerido\n");
         return;
+    }
     
     if (!existDisk(path))
+    {
+        printf("* ERROR: El diso no existe\n");
         return;
+    }
     
     printf("¿Eliminar el disco? s/n\n");
     scanf("%c", &select);

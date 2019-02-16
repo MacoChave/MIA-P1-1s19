@@ -112,7 +112,11 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     PartAdjust * adjusts = scanTableMBR(mbr, size, &free_part, &has_extended);
     selectFit(adjusts, &first, &worst, &best);
 
-    if (free_part < 0) return;;
+    if (free_part < 0)
+    {
+        printf("* ERROR: No hay particiones libres\n");
+        return;
+    }
     if (first < 0) return;
 
     part.part_fit = fit;
@@ -153,12 +157,18 @@ void exec_fdisk (MList ** parameters)
         {
             if (param->data_type == _INT_)
                 size = atoi(param->value);
-            else return;
+            else
+            {
+                printf("* ERROR: Size debe ser int\n");
+                return;
+            }
         }
         else if (param->type == _UNIT_)
         {
             if (param->data_type == _CHAR_)
                 unit = param->value[0];
+            else
+                printf("* ERROR: Unit debe ser char\n");
         }
         else if (param->type == _PATH_)
         {
@@ -167,17 +177,25 @@ void exec_fdisk (MList ** parameters)
                 path = (char *)malloc(sizeof(param->value));
                 strcpy(path, param->value);
             }
-            else return;
+            else
+            {
+                printf("* ERROR: Path debe ser string\n");
+                return;
+            }
         }
         else if (param->type == _TYPE_)
         {
             if (param->data_type == _CHAR_)
                 type = param->value[0];
+            else
+                printf("* ERROR: Type debe ser char\n");
         }
         else if (param->type == _FIT_)
         {
             if (param->data_type == _STRING_)
                 fit = param->value[0];
+            else
+                printf("* ERROR: Fit debe ser string\n");
         }
         else if (param->type == _DELETE_)
         {
@@ -186,6 +204,8 @@ void exec_fdisk (MList ** parameters)
                 del = (char *)malloc(strlen(param->value));
                 strcpy(del, param->value);
             }
+            else
+                printf("* ERROR: Delete debe ser string\n");
         }
         else if (param->type == _NAME_)
         {
@@ -194,21 +214,35 @@ void exec_fdisk (MList ** parameters)
                 name = (char *)malloc(strlen(param->value));
                 strcpy(name, param->value);
             }
-            else return;
+            else
+            {
+                printf("* ERROR: Name debe ser string\n");
+                return;
+            }
         }
         else if (param->type == _ADD_)
         {
             if (param->data_type == _INT_)
                 add = atoi(param->value);
+            else
+                printf("* ERROR: Add debe ser int\n");
         }
 
         deleteParameter(&param);
         param = NULL;
     }
 
-    if (path == NULL && name == NULL) return;
+    if (path == NULL && name == NULL)
+    {
+        printf("* ERROR: Path o Name son requeridos\n");
+        return;
+    }
 
-    if (!existDisk(path)) return;
+    if (!existDisk(path))
+    {
+        printf("* ERROR: El disco no existe\n");
+        return;
+    }
 
     if (unit == 'k')
     {
