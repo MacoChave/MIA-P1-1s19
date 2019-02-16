@@ -38,14 +38,17 @@ void selectFit (PartAdjust * adjusts, int * first, int * worst, int * best)
             if (adjusts[i].free_after >= 0)
                 *first = i;
         }
-        if (adjusts[i].free_after > adjusts[*worst].free_after)
-            *worst = i;
         if (adjusts[i].free_after < adjusts[*best].free_after)
             *best = i;
+        if (adjusts[i].free_after > adjusts[*worst].free_after)
+        {
+            if (adjusts[i].free_after > 0)
+                *worst = i;
+        }
     }
 }
 
-PartAdjust * scanTableMBR (MBR mbr, int size, int * free_part)
+PartAdjust * scanTableMBR (MBR mbr, int size, int * free_part, int * has_extended)
 {
     PartAdjust * adjusts = (PartAdjust *)malloc(sizeof(PartAdjust) * 4);
     int pivote = sizeof(MBR);
@@ -54,6 +57,9 @@ PartAdjust * scanTableMBR (MBR mbr, int size, int * free_part)
     {
         if (!mbr.partitions[i].part_status)
             *free_part = i;
+        else if (mbr.partitions[i].part_type == 'e')
+            *has_extended = 1;
+        
         PartAdjust adjust;
         adjust.start = pivote;
         adjust.free_space = mbr.partitions[i].part_start - pivote;
@@ -99,10 +105,11 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     int worst = 0;
     int first = -1;
     int free_part = -1;
+    int has_extended = 0;
     if (size < 0) return;
     if (existPartition(mbr, name)) return;
 
-    PartAdjust * adjusts = scanTableMBR(mbr, size, &free_part);
+    PartAdjust * adjusts = scanTableMBR(mbr, size, &free_part, &has_extended);
     selectFit(adjusts, &first, &worst, &best);
 
     if (free_part < 0) return;;
