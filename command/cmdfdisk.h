@@ -107,7 +107,11 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     int free_part = -1;
     int has_extended = 0;
     if (size < 0) return;
-    if (existPartition(mbr, name)) return;
+    if (existPartition(mbr, name))
+    {
+        printf("* ERROR: Ya existe una partición con el nombre: %s", name);
+        return;
+    }
 
     PartAdjust * adjusts = scanTableMBR(mbr, size, &free_part, &has_extended);
     selectFit(adjusts, &first, &worst, &best);
@@ -115,6 +119,11 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     if (free_part < 0)
     {
         printf("* ERROR: No hay particiones libres\n");
+        return;
+    }
+    if (type == 'e' && has_extended)
+    {
+        printf("* ERROR: Ya existe una partición extendida\n");
         return;
     }
     if (first < 0) return;
