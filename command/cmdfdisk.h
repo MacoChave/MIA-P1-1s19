@@ -109,7 +109,7 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     if (size < 0) return;
     if (existPartition(mbr, name))
     {
-        printf("* ERROR: Ya existe una partición con el nombre: %s", name);
+        printf("* ERROR: Ya existe una partición con el nombre: %s\n", name);
         return;
     }
 
@@ -139,11 +139,20 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     else if (fit == 'w')
         part.part_start = adjusts[worst].start;
     else if (fit == 'b')
-     part.part_start = adjusts[best].start;
+        part.part_start = adjusts[best].start;
 
     mbr.partitions[free_part] = part;
     mbr = sortMBR (mbr);
     updateMBR(path, &mbr);
+    
+    if (type == 'e')
+    {
+        EBR ebr = newEBR(0, 0);
+        strcpy(ebr.part_name, "Free");
+        ebr.part_next = -1;
+        ebr.part_status = 0;
+        updateEBR(path, &ebr, part.part_start);
+    }
 }
 
 void exec_fdisk (MList ** parameters)

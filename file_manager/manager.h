@@ -165,4 +165,29 @@ int updateMBR (char * filename, MBR * data)
     return 1;
 }
 
+EBR getEBR (char * filename, int start)
+{
+    EBR ebr = newEBR(0, 0);
+    FILE * file;
+    if ((file = fopen(filename, "rb")) == NULL)
+        return ebr;
+    
+    fseek(file, start, SEEK_SET);
+    fread(&ebr, sizeof(EBR), 1, file);
+    fclose(file);
+    return ebr;
+}
+
+int updateEBR (char * filename, EBR * data, int pos)
+{
+    FILE * file;
+    if ((file = fopen(filename, "rb+")) == NULL)
+        return 0;
+    
+    fseek(file, pos, SEEK_SET);
+    fwrite(data, sizeof(EBR), 1, file);
+    fclose(file);
+    return 1;
+}
+
 #endif // MANAGER_H_INCLUDED
