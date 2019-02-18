@@ -14,16 +14,16 @@ struct PartAdjust
     int free_after;
 };
 
-int existPartition (MBR mbr, char * name)
+int partitionNumber (MBR mbr, char * name)
 {
     for(int i = 0; i < 4; i++)
     {
         Partition part = mbr.partitions[i];
         if (strcasecmp(part.part_name, name) == 0)
-            return 1;
+            return i;
     }
 
-    return 0;
+    return -1;
 }
 
 void selectFit (PartAdjust * adjusts, int * first, int * worst, int * best)
@@ -90,12 +90,33 @@ MBR sortMBR (MBR mbr)
 
 void deletePart (MBR mbr, char * path, char * name, char * del)
 {
-    if (!existPartition(mbr, name)) return;
+    int partNumber = partitionNumber(mbr, name);
+    if (partNumber < 0)
+    {
+        printf("* ERROR: No existe la partición %s.\n", name);
+        return;
+    }
+    
+    if (strcasecmp(del, "full") == 0)
+        clearDisk(path, mbr.partitions[partNumber].part_start, mbr.partitions[partNumber].part_size);
+    mbr.partitions[partNumber].part_status = 0;
+    mbr.partitions[partNumber].part_type = '\0';
+    mbr.partitions[partNumber].part_fit = '\0';
+    mbr.partitions[partNumber].part_size = mbr.size;
+    mbr.partitions[partNumber].part_size = 0;
+    memset(mbr.partitions[partNumber].part_name, 0, 16);
+    strcpy(mbr.partitions[partNumber].part_name, "free");
+    updateMBR(path, &mbr);
 }
 
 void modifyPart(MBR mbr, char * path, char * name, int add, char unit)
 {
-    if (!existPartition(mbr, name)) return;
+    int partNumber = partitionNumber(mbr, name);
+    if (partNumber < 0)
+    {
+        printf("* ERROR: No existe la partición %s\n", name);
+        return;
+    }
 }
 
 void createPart (MBR mbr, char * path, char * name, int size, char unit, char type, char fit)
@@ -107,7 +128,7 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     int free_part = -1;
     int has_extended = 0;
     if (size < 0) return;
-    if (existPartition(mbr, name))
+    if (partitionNumber(mbr, name) >= 0)
     {
         printf("* ERROR: Ya existe una partición con el nombre: %s\n", name);
         return;

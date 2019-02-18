@@ -123,6 +123,27 @@ int createDisk (char * filename, int size)
     return 1;
 }
 
+int clearDisk (char * filename, int start, int size)
+{
+    FILE * file;
+
+    if ((file = fopen(filename, "rb+")) == NULL)
+        return 0;
+    
+    char buffer[_KILOBYTE_];
+    memset(buffer, '\0', _KILOBYTE_);
+
+    fseek(file, start, SEEK_SET);
+    for(int i = 0; i < size / _KILOBYTE_; i++)
+    {
+        fwrite(buffer, sizeof(buffer), 1, file);
+        fflush(file);
+    }
+
+    fclose(file);
+    return 1;
+}
+
 int deleteDisk (char * filename)
 {
     return (remove(filename) == 0) ? 1 : 0;

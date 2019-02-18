@@ -146,7 +146,7 @@ MList * automaton (char * line, int * cmd_type)
             if (*s != ' ')
             {
                 sprintf(temp, "%s%c", temp, tolower(*s));
-                type_value = ((isdigit(*s) || *s == '-') && type_value == _INT_) ? _INT_ : _CHAR_;
+                type_value = ((isdigit(*s) || *s == '-' || *s == '.') && type_value == _INT_) ? _INT_ : _CHAR_;
                 s++;
                 continue;
             }
