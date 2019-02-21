@@ -9,6 +9,7 @@
 #include "../command/cmdmkdisk.h"
 #include "../command/cmdrmdisk.h"
 #include "../command/cmdfdisk.h"
+#include "../command/cmdmount.h"
 
 /* INTERPRETAR TIPO DE COMANDO */
 int getCommandNumber (char * name)
@@ -200,6 +201,7 @@ MList * automaton (char * line, int * cmd_type)
 /* EJECUTAR COMANDO */
 void execute (int cmd_type, MList ** parameters)
 {
+    printf("\n\tCOMANDO: %d\t\n", cmd_type);
     switch (cmd_type)
     {
         case _MKDISK_:
@@ -211,10 +213,12 @@ void execute (int cmd_type, MList ** parameters)
             exec_rmdisk(parameters);
             break;
         case _FDISK_:
+            /* EDITAR PARTICIONES */
             exec_fdisk(parameters);
             break;
         case _MOUNT_:
             /* MONTAR PARTICIONES */
+            exec_mount(parameters);
             break;
         case _UNMOUNT_:
             /* DESMONTAR PARTICIONES */

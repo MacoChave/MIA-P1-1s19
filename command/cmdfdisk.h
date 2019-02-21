@@ -14,21 +14,9 @@ struct PartAdjust
     int free_after;
 };
 
-int partitionNumber (MBR mbr, char * name)
-{
-    for(int i = 0; i < 4; i++)
-    {
-        Partition part = mbr.partitions[i];
-        if (strcasecmp(part.part_name, name) == 0)
-            return i;
-    }
-
-    return -1;
-}
-
 void selectFit (PartAdjust * adjusts, int * first, int * worst, int * best)
 {
-    if (adjusts[0].free_space >= 0)
+    if (adjusts[0].free_after >= 0)
         *first = 0;
 
     for(int i = 0; i < 4; i++)
@@ -39,7 +27,10 @@ void selectFit (PartAdjust * adjusts, int * first, int * worst, int * best)
                 *first = i;
         }
         if (adjusts[i].free_after < adjusts[*best].free_after)
-            *best = i;
+        {
+            if (adjusts[i].free_after > 0)
+                *best = i;
+        }
         if (adjusts[i].free_after > adjusts[*worst].free_after)
         {
             if (adjusts[i].free_after > 0)
@@ -55,7 +46,7 @@ PartAdjust * scanTableMBR (MBR mbr, int size, int * free_part, int * has_extende
 
     for(int i = 0; i < 4; i++)
     {
-        if (!mbr.partitions[i].part_status)
+        if (!mbr.partitions[i].part_status && *free_part < 0)
             *free_part = i;
         else if (mbr.partitions[i].part_type == 'e')
             *has_extended = 1;
@@ -65,7 +56,7 @@ PartAdjust * scanTableMBR (MBR mbr, int size, int * free_part, int * has_extende
         adjust.free_space = mbr.partitions[i].part_start - pivote;
         adjust.free_after = adjust.free_space - size;
         adjusts[i] = adjust;
-        pivote += adjust.free_space;
+        pivote = mbr.partitions[i].part_start + mbr.partitions[i].part_size;
     }
 
     return adjusts;
@@ -135,21 +126,29 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     }
 
     PartAdjust * adjusts = scanTableMBR(mbr, size, &free_part, &has_extended);
+    best = free_part;
     selectFit(adjusts, &first, &worst, &best);
 
     if (free_part < 0)
     {
         printf("* ERROR: No hay particiones libres\n");
+        free(adjusts);
         return;
     }
     if (type == 'e' && has_extended)
     {
         printf("* ERROR: Ya existe una partición extendida\n");
+        free(adjusts);
         return;
     }
-    if (first < 0) return;
+    if (first < 0) 
+    {
+        free(adjusts);
+        return;
+    }
 
     part.part_fit = fit;
+    memset(part.part_name, 0, 16);
     strcpy(part.part_name, name);
     part.part_size = size;
     part.part_status = 1;
@@ -168,17 +167,16 @@ void createPart (MBR mbr, char * path, char * name, int size, char unit, char ty
     
     if (type == 'e')
     {
-        EBR ebr = newEBR(0, 0);
-        strcpy(ebr.part_name, "Free");
-        ebr.part_next = -1;
-        ebr.part_status = 0;
+        EBR ebr = newEBR(part.part_start, size);
         updateEBR(path, &ebr, part.part_start);
     }
+
+    free(adjusts);
+    adjusts = NULL;
 }
 
 void exec_fdisk (MList ** parameters)
 {
-    Parameter * param;
     MBR mbr;
     int size = 0;
     char unit = 'k';
@@ -191,16 +189,14 @@ void exec_fdisk (MList ** parameters)
 
     while((*parameters)->size > 0)
     {
-        param = (Parameter *)pop_front(parameters);
+        Parameter * param = (Parameter *)pop_front(parameters);
+
         if (param->type == _SIZE_)
         {
             if (param->data_type == _INT_)
                 size = atoi(param->value);
             else
-            {
                 printf("* ERROR: Size debe ser int\n");
-                return;
-            }
         }
         else if (param->type == _UNIT_)
         {
@@ -214,13 +210,11 @@ void exec_fdisk (MList ** parameters)
             if (param->data_type == _STRING_)
             {
                 path = (char *)malloc(sizeof(param->value));
+                memset(path, 0, strlen(param->value));
                 strcpy(path, param->value);
             }
             else
-            {
                 printf("* ERROR: Path debe ser string\n");
-                return;
-            }
         }
         else if (param->type == _TYPE_)
         {
@@ -241,6 +235,7 @@ void exec_fdisk (MList ** parameters)
             if (param->data_type == _STRING_)
             {
                 del = (char *)malloc(strlen(param->value));
+                memset(del, 0, strlen(param->value));
                 strcpy(del, param->value);
             }
             else
@@ -251,13 +246,11 @@ void exec_fdisk (MList ** parameters)
             if (param->data_type == _STRING_)
             {
                 name = (char *)malloc(strlen(param->value));
+                memset(name, 0, strlen(param->value));
                 strcpy(name, param->value);
             }
             else
-            {
                 printf("* ERROR: Name debe ser string\n");
-                return;
-            }
         }
         else if (param->type == _ADD_)
         {
@@ -274,12 +267,18 @@ void exec_fdisk (MList ** parameters)
     if (path == NULL && name == NULL)
     {
         printf("* ERROR: Path o Name son requeridos\n");
+        if (path != NULL) free(path);
+        if (name != NULL) free(name);
+        if (del != NULL) free(del);
         return;
     }
 
     if (!existDisk(path))
     {
         printf("* ERROR: El disco no existe\n");
+        free(path);
+        free(name);
+        if (del != NULL) free(del);
         return;
     }
 
@@ -304,6 +303,10 @@ void exec_fdisk (MList ** parameters)
     if (del != NULL) deletePart(mbr, path, name, del);
     else if (add != 0) modifyPart(mbr, path, name, add, unit);
     else createPart(mbr, path, name, size, unit, type, fit);
+
+    free(path);
+    free(name);
+    if (del != NULL) free(del);
 }
 
 #endif // CMDFDISK_H_INCLUDED

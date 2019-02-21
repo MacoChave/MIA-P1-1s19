@@ -37,6 +37,31 @@ struct EBR
     char part_name[16];
 };
 
+Partition newPartition(int start) {
+    Partition part;
+    part.part_status = 0;
+    part.part_type = '\0';
+    part.part_fit = '\0';
+    part.part_start = start;
+    part.part_size = 0;
+    memset(part.part_name, 0, 16);
+    strcpy(part.part_name, "FREE");
+
+    return part;
+}
+
+int partitionNumber (MBR mbr, char * name)
+{
+    for(int i = 0; i < 4; i++)
+    {
+        Partition part = mbr.partitions[i];
+        if (strcasecmp(part.part_name, name) == 0)
+            return i;
+    }
+
+    return -1;
+}
+
 char * getCurrentDate ()
 {
     time_t datetime = time(0);
@@ -54,25 +79,11 @@ int getRandom ()
     return rand() % 100;
 }
 
-Partition newPartition (int start)
-{
-    Partition part;
-    part.part_status = 0;
-    part.part_type = '\0';
-    part.part_fit = '\0';
-    part.part_start = start;
-    part.part_size = 0;
-    memset(part.part_name, 0, 16);
-    strcpy(part.part_name, "free");
-
-    return part;
-}
-
 MBR newMBR (int size)
 {
     MBR mbr;
     mbr.size = size;
-    memset(mbr.mbr_fecha_creacion, 0, 18);
+    memset(mbr.mbr_fecha_creacion, 0, 16);
     strcpy(mbr.mbr_fecha_creacion, getCurrentDate());
     mbr.mbr_disk_signature = getRandom();
 
@@ -91,6 +102,7 @@ EBR newEBR(int start, int size)
     ebr.part_size = size;
     ebr.part_next = -1;
     memset(ebr.part_name, 0, 16);
+    strcpy(ebr.part_name, "FREE");
 
     return ebr;
 }

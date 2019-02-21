@@ -1,11 +1,13 @@
-#ifndef STRUCT_DISK_H_INCLUDED
-#define STRUCT_DISK_H_INCLUDED
+#ifndef STRUCTDISK_H_INCLUDED
+#define STRUCTDISK_H_INCLUDED
 
 #include "mlist.h"
 #include "string.h"
 
 typedef struct Disk Disk;
-typedef struct Partition Partition;
+typedef struct Part Part;
+
+MList * mounted = NULL;
 
 struct Disk
 {
@@ -14,7 +16,7 @@ struct Disk
     MList * Partitions;
 };
 
-struct Partition
+struct Part
 {
     char * name;
     int serie;
@@ -25,54 +27,54 @@ Disk * newDisk ()
     Disk * disk = (Disk *)malloc(sizeof(Disk));
     disk->letter = '\0';
     disk->path = NULL;
-    disk->Partitions = newMList();
+    disk->Partitions = NULL;
 
     return disk;
 }
 
-Partition * newPartition()
+Part * newPart()
 {
-    Partition * partition = (Partition *)malloc(sizeof(Partition));
+    Part * partition = (Part *)malloc(sizeof(Part));
     partition->name = NULL;
     partition->serie = 0;
 
     return partition;
 }
 
-/* COMPARA LETRO DE DISCO */
-int compareDiskLetter (void * disk1, void * disk2)
+/* COMPARA LETRA DE DISCO */
+int compareDiskLetter (void * disk1, void * letter)
 {
-    if (((Disk *)disk1)->letter > ((Disk *)disk2)->letter)
+    if (((Disk *)disk1)->letter > ((char *)letter)[0])
         return 1;
-    if (((Disk *)disk1)->letter < ((Disk *)disk2)->letter)
-        return 1;
+    if (((Disk *)disk1)->letter < ((char *)letter)[0])
+        return -1;
     return 0;
 }
 
 /* COMPARA NUMERO DE PARTICION */
-int comparePartitionSerial (void * partition1, void * partition2)
+int comparePartitionSerial (void * part, void * serial)
 {
-    if (((Partition *)partition1)->serie > ((Partition *)partition2)->serie)
+    if (((Part *)part)->serie > *((int *)serial))
         return 1;
-    if (((Partition *)partition1)->serie < ((Partition *)partition2)->serie)
+    if (((Part *)part)->serie < *((int *)serial))
         return -1;
     return 0;
 }
 
 /* COMPARAR PATH DE DISCO */
-int compareDiskPath (void * path, void * disk)
+int compareDiskPath (void * disk, void * path)
 {
-    int cmp = strcmp((char *)path, ((Disk *)disk)->path);
+    int cmp = strcmp(((Disk *)disk)->path, (char *)path);
 
     return (cmp > 0) ? 1: (cmp < 0) ? -1 : 0;
 }
 
 /* COMPARAR NOMBRE DE PARTICION */
-int comparePartitionName (void * name, void * partition)
+int comparePartitionName (void * part, void * name)
 {
-    int cmp = strcmp((char *)name, ((Partition *)partition)->name);
+    int cmp = strcmp(((Part *)part)->name, (char *)name);
 
     return (cmp > 0) ? 1 : (cmp < 0) ? -1 : 0;
 }
 
-#endif // STRUCT_DISK_H_INCLUDED
+#endif // STRUCTDISK_H_INCLUDED

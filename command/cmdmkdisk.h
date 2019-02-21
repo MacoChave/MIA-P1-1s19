@@ -21,33 +21,25 @@ void exec_mkdisk (MList ** parameters)
             if (param->data_type == _STRING_)
             {
                 path = (char *)malloc(strlen(param->value));
+                memset(path, 0, strlen(param->value));
                 strcpy(path, param->value);
             }
             else
-            {
                 printf("* ERROR: Path debe ser string\n");
-                return;
-            }
         }
         else if (param->type == _SIZE_)
         {
             if (param->data_type == _INT_)
                 size = atoi(param->value);
             else
-            {
                 printf("* ERROR: Size debe ser int\n");
-                return;
-            }
         }
         else if (param->type == _FIT_)
         {
             if (param->data_type == _STRING_)
                 fit = param->value[0];
             else
-            {
                 printf("* ERROR: Fit debe ser String\n");
-                return;
-            }
             
         }
         else if (param->type == _UNIT_)
@@ -55,10 +47,7 @@ void exec_mkdisk (MList ** parameters)
             if (param->data_type == _CHAR_)
                 unit = param->value[0];
             else
-            {
                 printf("* ERROR: Unit debe ser char\n");
-                return;
-            }
         }
 
         deleteParameter(&param);
@@ -68,6 +57,7 @@ void exec_mkdisk (MList ** parameters)
     if (path == NULL || size < 0)
     {
         printf("* ERROR: Path o Size son requeridos\n");
+        if (path != NULL) free(path);
         return;
     }
     
@@ -81,23 +71,28 @@ void exec_mkdisk (MList ** parameters)
     if (!createDirectory(path))
     {
         printf("* ERROR: No se pudo crear el directorio\n");
+        free(path);
         return;
     }
     
     if (existDisk(path))
     {
         printf("* ERROR: El disco ya existe\n");
+        free(path);
         return;
     }
     
     if (!createDisk(path, size))
     {
         printf("* ERROR: No se pudo crear el disco\n");
+        free(path);
         return;
     }
     
     mbr = newMBR(size);
     updateMBR(path, &mbr);
+
+    free(path);
 }
 
 #endif // CMDMKDISK_H_INCLUDED

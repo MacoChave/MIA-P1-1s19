@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "interpreter/compiler.h"
+#include "struct/disk.h"
 
 /*****************************************
  * METODO LECTURA DE LÍNEA DE COMANDO

@@ -9,25 +9,24 @@ void exec_rmdisk (MList ** parameters)
 {
     char select = 'n';
     char * path;
-    Parameter * param = NULL;
+
     while((*parameters)->size > 0)
     {
-        param = (Parameter *)pop_back(parameters);
+        Parameter * param = (Parameter *)pop_back(parameters);
         if (param->type == _PATH_)
         {
             if (param->data_type == _STRING_)
             {
                 path = (char *)malloc(strlen(param->value));
+                memset(path, 0, strlen(param->value));
                 strcpy(path, param->value);
             }
             else
-            {
                 printf("* ERROR: Path debe ser String\n");
-                return;
-            }
-            deleteParameter(&param);
-            param = NULL;
         }
+
+        deleteParameter(&param);
+        param = NULL;
     }
 
     if (path == NULL)
@@ -39,6 +38,7 @@ void exec_rmdisk (MList ** parameters)
     if (!existDisk(path))
     {
         printf("* ERROR: El diso no existe\n");
+        free(path);
         return;
     }
     
