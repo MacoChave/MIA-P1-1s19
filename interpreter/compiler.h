@@ -276,6 +276,7 @@ void analizeLine (char * line)
             if (param->type == _PATH_ && param->data_type == _STRING_)
             {
                 filename = (char *)malloc(strlen(param->value));
+                memset(filename, 0, strlen(param->value));
                 strcpy(filename, param->value);
                 deleteParameter(&param);
                 param = NULL;

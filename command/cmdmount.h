@@ -8,7 +8,7 @@
 void pushDisk (Disk ** disk)
 {
     Disk * disk1 = (Disk *)peek_back(mounted);
-    (*disk)->letter = (disk1 == NULL) ? 'a' : disk1->letter++;
+    (*disk)->letter = (disk1 == NULL) ? 'a' : disk1->letter + 1;
 
     push_back(&mounted, *disk);
 }
@@ -16,7 +16,7 @@ void pushDisk (Disk ** disk)
 void pushPart (MList * parts, Part *part)
 {
     Part * part1 = (Part *)peek_back(parts);
-    part->serie = (part1 == NULL) ? 1 : part1->serie++;
+    part->serie = (part1 == NULL) ? 1 : part1->serie + 1;
 
     push_back(&parts,part);
 }
@@ -30,7 +30,7 @@ void mountPart (MBR mbr, char * path, char * name)
         return;
     }
 
-    Disk * disk = (Disk *)get_item_unordered(mounted, name, compareDiskPath);
+    Disk * disk = (Disk *)get_item_unordered(mounted, path, compareDiskPath);
     if (disk == NULL)
     {
         disk = newDisk();
@@ -110,7 +110,7 @@ void exec_mount (MList ** parameters)
 
     mbr = getMBR(path);
     mountPart(mbr, path, name);
-
+    
     free(path);
     free(name);
 }
