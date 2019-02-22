@@ -34,7 +34,7 @@ char * getDirectoryPath (char * filename)
     return fileDir;
 }
 
-char * getName (char * filename)
+char * getNamePath (char * filename)
 {
     char * s = filename;
 
@@ -42,10 +42,11 @@ char * getName (char * filename)
     memset(name, 0, strlen(filename));
     while(*s)
     {
-        if (*s != '/')
+        if (*s != '/' && *s != '.')
             sprintf(name, "%s%c", name, *s);
         else if (*s == '/')
-            memset(name, 0, strlen(filename));    
+            memset(name, 0, strlen(filename));
+        else if (*s == '.') break;
         *s++;
     }
 
@@ -60,12 +61,16 @@ int getExtensionNumber (char * extension)
         return _DISK_;
     if (strcmp(extension, "png") == 0)
         return _PNG_;
+    if (strcmp(extension, "jpg") == 0)
+        return _JPG_;
     if (strcmp(extension, "jpeg") == 0)
         return _JPG_;
+    if (strcmp(extension, "pdf") == 0)
+        return _PDF_;
     return -1;
 }
 
-int getExtension (char * filename)
+int getExtensionPath (char * filename)
 {
     char * s = filename;
 
@@ -101,6 +106,51 @@ int createDirectory (char * filename)
     int result = (system(cmd) == 0) ? 1 : 0;
 
     return result;
+}
+
+int createFile (char * filename, char * data)
+{
+    FILE * file;
+    
+    if ((file = fopen(filename, "w")) == 0)
+        return 0;
+
+    fprintf(file, "%s", data);
+    fclose(file);
+    return 1;
+}
+
+int updateFile (char * filename, char * data)
+{
+    FILE * file;
+    
+    if ((file = fopen(filename, "a+")) == 0)
+        return 0;
+
+    fprintf(file, "%s", data);
+    fclose(file);
+    return 1;
+}
+
+void createReport (char * directory, char * name, char * ext)
+{
+    char cmd[125];
+    memset(cmd, 0, 125);
+    strcpy(cmd, "dot -T");
+    strcat(cmd, ext);
+    strcat(cmd, " ");
+    strcat(cmd, directory);
+    strcat(cmd, "/");
+    strcat(cmd, name);
+    strcat(cmd, ".dot -o ");
+    strcat(cmd, directory);
+    strcat(cmd, "/");
+    strcat(cmd, name);
+    strcat(cmd, ".");
+    strcat(cmd, ext);
+    printf("* CMD: %s\n", cmd);
+    system(cmd);
+
 }
 
 int createDisk (char * filename, int size)

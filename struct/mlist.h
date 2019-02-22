@@ -49,9 +49,9 @@ void deleteMListNode (MListNode ** node)
 
  void push_front (MList ** list, void * info)
  {
-         MListNode * node = newMListNode(info);
-
-    if ((*list)->size == 0)
+     MListNode * node = newMListNode(info);
+     
+     if ((*list)->size == 0)
         (*list)->first = (*list)->last = node;
     else
     {
@@ -66,7 +66,6 @@ void deleteMListNode (MListNode ** node)
 void push_back (MList ** list, void * info)
 {
     MListNode * node = newMListNode(info);
-    node->info = info;
 
     if ((*list)->size == 0)
         (*list)->first = (*list)->last = node;

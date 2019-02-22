@@ -9,6 +9,7 @@
 #define _DISK_ 0
 #define _PNG_ 1
 #define _JPG_ 2
+#define _PDF_ 3
 
 /* SIZE STRING */
 #define _SIZE_STRING_ sizeof(char) * 125

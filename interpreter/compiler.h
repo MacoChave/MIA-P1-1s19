@@ -10,6 +10,7 @@
 #include "../command/cmdrmdisk.h"
 #include "../command/cmdfdisk.h"
 #include "../command/cmdmount.h"
+#include "../command/cmdrep.h"
 
 /* INTERPRETAR TIPO DE COMANDO */
 int getCommandNumber (char * name)
@@ -225,6 +226,7 @@ void execute (int cmd_type, MList ** parameters)
             break;
         case _REP_:
             /* CREAR REPORTES */
+            exec_rep(parameters);
             break;
         default:
             break;
@@ -262,7 +264,11 @@ void analizeLine (char * line)
     MList * parameters = automaton(line, &cmd_type);
 
     if (parameters->size == 0 || cmd_type < 0)
+    {
+        free(parameters);
+        parameters = NULL;
         return;
+    }
         
     if (cmd_type > _EXEC_)
         execute(cmd_type, &parameters);
